@@ -214,6 +214,61 @@ app.put('/quotes', (req, res) => {
   - `upsert` is what happens if the record isn't found. `true` here means we insert a new record if one isn't found.
 - `callback` is what to do when `findOneAndUpdate` is done.
 
+# cruD
+
+- very similar to everything we've done so far.
+- `app` has a `delete` method you can call.
+- the `collection` object on `db` has a `findOneAndUpdate` method you can call like `db.collection('quotes').findOneAndDelete(` ...
+- example `server.js`
+```
+app.delete('/quotes', (req, res) => {
+
+  const query = {
+    name: req.body.name
+  }
+  
+  const callback = (err, result) => {
+    if (err) return res.send(500, err)
+    res.send({message: 'A darth vadar quote got deleted'})
+  }
+
+  db.collection('quotes').findOneAndDelete(
+    query,
+    callback
+  )
+})
+```
+- example `scripts.js`
+```
+var del = document.getElementById('delete')
+
+del.addEventListener('click', function () {
+  fetch('quotes', {
+    method: 'delete',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      'name': 'Darth Vader'
+    })
+  })
+  .then(res => {
+    if (res.ok) return res.json()
+  }).
+  then(data => {
+    console.log(data)
+    window.location.reload()
+  })
+})
+```
+- and a DOM element in `index.ejs` that looks like this:
+```
+<div>
+  <h2>Delete Darth Vadar's first quote</h2>
+  <button id="delete"> Delete first Darth Vadar quote </button>
+</div>
+```
+
 
 # Questions
 - How to use webpack?

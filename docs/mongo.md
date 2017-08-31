@@ -33,6 +33,14 @@ db.collections('quotes').findOneAndUpdate(
   callback
 )
 ```
+- `findOneAndDelete`
+```
+db.collections('quotes').findOneAndDelete(
+  query,
+  options,
+  callback
+)
+```
 
 ### find methods
 

@@ -63,12 +63,29 @@ app.put('/quotes', (req, res) => {
     if (err) return res.send(err)
     res.send(result)
   }
-  
+
   // Handle put request
   db.collection('quotes').findOneAndUpdate(
     query,
     update,
     options,
+    callback
+  )
+})
+
+app.delete('/quotes', (req, res) => {
+
+  const query = {
+    name: req.body.name
+  }
+  
+  const callback = (err, result) => {
+    if (err) return res.send(500, err)
+    res.send({message: 'A darth vadar quote got deleted'})
+  }
+
+  db.collection('quotes').findOneAndDelete(
+    query,
     callback
   )
 })

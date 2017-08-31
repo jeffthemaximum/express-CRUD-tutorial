@@ -33,3 +33,5 @@ app.set('view engine', 'ejs')
 ### verbs
 - `app.get`
 - `app.post`
+- `app.put`
+- `app.delete`
