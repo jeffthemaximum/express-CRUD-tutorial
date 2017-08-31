@@ -7,6 +7,7 @@ const Secrets = require("./secrets.js")
 
 // middlewares
 app.use(bodyParser.urlencoded({extended: true}))
+app.set('view engine', 'ejs')
 
 // Mongo
 var db
@@ -21,9 +22,13 @@ MongoClient.connect(Secrets.dbUrl, (err, database) => {
 })
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html')
+  db.collection('quotes').find().toArray((err, result) => {
+    if (err) return console.log(err)
+    // renders index.ejs
+    console.log(result)
+    res.render('index.ejs', {quotes: result})
+  })
 })
-
 
 app.post('/quotes', (req, res) => {
   db.collection('quotes').save(req.body, (err, result) => {
