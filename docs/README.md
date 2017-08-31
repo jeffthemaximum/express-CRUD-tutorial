@@ -110,9 +110,9 @@ MongoClient.connect('your-mongodb-url', (err, database) => {
 - this also inits the express server from within the clients `connect` method.
 
 ### use mongo to C
-	- `collections` seem to be the mongo equivalent of a SQL table
-	- make/connect to a collection when user submits the form with `db.collection('quotes')`. Save an entry to it with `db.collection('quotes').save(data, (err, result) => {})
-	- example:
+- `collections` seem to be the mongo equivalent of a SQL table
+- make/connect to a collection when user submits the form with `db.collection('quotes')`. Save an entry to it with `db.collection('quotes').save(data, (err, result) => {})
+- example:
 ```
 app.post('/quotes', (req, res) => {
   db.collection('quotes').save(req.body, (err, result) => {
@@ -123,6 +123,96 @@ app.post('/quotes', (req, res) => {
   })
 })
 ```
+
+# add static files
+
+- use express middleware `use` method to register static folder
+```
+app.use(express.static('public'))
+```
+
+- make a `static` folder at root of application
+- make `static/scripts.js`
+- add some js in there
+- add it to `index.ejs` with:
+```
+<script src="scripts.js"></script>
+```
+
+# crUd
+
+- use a `PUT` request to update
+- register a listener on app with the `put` method like `app.put('/quotes', (req, res) => {`...
+- make a btn in `index.ejs` thats clickable
+```
+<div>
+  <h2>Replace last quote written by Master Yoda with a quote written by Darth Vadar</h2>
+  <button id="update"> Darth Vadar invades! </button>
+</div>
+```
+- register an event listener on that button inb `scripts.js`
+```
+var update = document.getElementById('update')
+
+update.addEventListener('click', function () {
+  // Send PUT Request here
+  fetch('quotes', {
+    method: 'put',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      'name': 'Darth Vader',
+      'quote': 'I find your lack of faith disturbing.'
+    })
+  })
+  .then(res => {
+    if (res.ok) return res.json()
+  })
+  .then(data => {
+    console.log(data)
+    window.location.reload(true)
+  })
+})
+```
+- update `app.put("/quotes"...` to look like:
+```
+app.put('/quotes', (req, res) => {
+  const query = {
+    name: 'emily'
+  }
+
+  const update = {
+    $set : {
+      name: req.body.name,
+      quote: req.body.quote
+    }
+  }
+
+  const options = {
+    sort: {_id: -1},
+    upsert: true
+  }
+
+  const callback = (err, result) => {
+    if (err) return res.send(err)
+    res.send(result)
+  }
+  
+  // Handle put request
+  db.collection('quotes').findOneAndUpdate(
+    query,
+    update,
+    options,
+    callback
+  )
+})
+```
+- the `collection` object has the `findOneAndUpdate` method that can be called on it, that takes for args: `query, update, options, callback`
+- `query` is how you find your object
+- `update` has update operators you can use. So far I just know `$set`, which is how you want to update the found record.
+- `options` in this case does two things:
+  - `sort` is how you want the results sorted. I sort by reverse id's here.
+  - `upsert` is what happens if the record isn't found. `true` here means we insert a new record if one isn't found.
+- `callback` is what to do when `findOneAndUpdate` is done.
 
 
 # Questions

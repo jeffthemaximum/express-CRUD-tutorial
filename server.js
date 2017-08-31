@@ -7,6 +7,9 @@ const Secrets = require("./secrets.js")
 
 // middlewares
 app.use(bodyParser.urlencoded({extended: true}))
+app.use(express.static('public'))
+app.use(bodyParser.json())
+
 app.set('view engine', 'ejs')
 
 // Mongo
@@ -37,4 +40,35 @@ app.post('/quotes', (req, res) => {
     console.log('saved to database')
     res.redirect('/')
   })
+})
+
+app.put('/quotes', (req, res) => {
+  const query = {
+    name: 'emily'
+  }
+
+  const update = {
+    $set : {
+      name: req.body.name,
+      quote: req.body.quote
+    }
+  }
+
+  const options = {
+    sort: {_id: -1},
+    upsert: true
+  }
+
+  const callback = (err, result) => {
+    if (err) return res.send(err)
+    res.send(result)
+  }
+  
+  // Handle put request
+  db.collection('quotes').findOneAndUpdate(
+    query,
+    update,
+    options,
+    callback
+  )
 })
